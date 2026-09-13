@@ -6,11 +6,12 @@
 <title>Бінго на матч</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rubik:wght@400;500&display=swap');
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{box-sizing:border-box;margin:0;padding:0}
 body{min-height:100vh;background:#0b1020;
   background-image:radial-gradient(60vw 40vh at 110% 110%, rgba(232,73,46,.16), transparent 60%),
                    radial-gradient(50vw 30vh at -10% -10%, rgba(39,67,214,.22), transparent 60%);
-  color:#eef1f9;font-family:'Rubik',system-ui,sans-serif;padding:0 0 40px}
+  color:#eef1f9;font-family:'Rubik',system-ui,sans-serif;padding:0 0 90px}
 .wrap{max-width:480px;margin:0 auto;padding:18px 14px}
 .h{font-family:'Oswald','Rubik',sans-serif;text-transform:uppercase;letter-spacing:.04em}
 .kicker{font-size:13px;color:#8b93ad}
@@ -23,9 +24,10 @@ body{min-height:100vh;background:#0b1020;
   cursor:pointer;color:#0b1020;background:#37e07c}
 .btn.ghost{background:transparent;color:#cdd4ea;border:1px solid #3a4569}
 .btn:active{transform:scale(.98)}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%}
 .cell{aspect-ratio:1;border:1px solid #26304f;border-radius:9px;background:#121829;color:#cdd4ea;
-  font-family:'Rubik';font-size:10.5px;line-height:1.22;padding:5px 4px;cursor:pointer;
+  font-family:'Rubik';font-size:clamp(7.5px,2.25vw,11px);line-height:1.2;padding:4px 3px;cursor:pointer;
+  min-width:0;overflow:hidden;overflow-wrap:anywhere;hyphens:auto;
   display:flex;align-items:center;justify-content:center;text-align:center;
   transition:background .12s,border-color .12s;-webkit-tap-highlight-color:transparent}
 .cell:focus-visible{outline:2px solid #7df0ac;outline-offset:2px}
@@ -40,7 +42,7 @@ body{min-height:100vh;background:#0b1020;
 .shout.show{display:block}
 .note{margin-top:18px;font-size:13px;color:#8b93ad;line-height:1.5;border-top:1px solid #232b47;padding-top:14px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}.btn:active{transform:none}}
-@media (max-width:360px){.cell{font-size:9.5px}.title{font-size:34px}}
+@media (max-width:360px){.title{font-size:32px}}
 </style>
 </head>
 <body>
@@ -70,15 +72,15 @@ var EVENTS = [
   "Пенальті","Червона картка","Гол головою","Влучили в штангу","Автогол",
   "Гол зі штрафного","VAR скасував гол","Суддя пішов до монітора","Офсайд на міліметри",
   "Нічия 0:0 у перерві","Заміна до 30-ї хвилини","Травма з носилками","Суперечка з арбітром",
-  "Жовта за симуляцію","Гол у компенсований час","Камера показала тренера","Тренер розлютився",
-  "Повтор із трьох ракурсів","Вболівальник із прапором","Камера знайшла дитину на трибуні",
+  "Жовта за симуляцію","Гол у компенсований","Камера показала тренера","Тренер розлютився",
+  "Повтор із трьох ракурсів","Фанат із прапором","Дитина на трибуні",
   "Пас назад воротарю","Воротар вибив за бокову","Кутовий без удару","Стінка підстрибнула",
-  "М'яч у сітку збоку","Суддя показав «граємо далі»","Четвертий арбітр підняв табло",
+  "М'яч у сітку збоку","Суддя: граємо далі","Табло на заміну",
   "Воротар пішов на кутовий","Фол останньої надії","Гравець зняв футболку",
   "Святкування на колінах","Два голи за пʼять хвилин","Удар у дальню дев'ятку","Гол після рикошету",
   "Пенальті не забили","Воротар відбив пенальті","Гравець просить заміну","Дощ або сніг на полі",
-  "Порожні сектори в кадрі","Піротехніка на трибунах","Коментатор згадав 2006-й",
-  "Коментатор переплутав гравців","Мʼяч влетів на трибуни","Суддя відрахував дистанцію спреєм"
+  "Порожні сектори","Піротехніка на трибунах","Коментатор згадав 2006-й",
+  "Коментатор переплутав гравців","Мʼяч влетів на трибуни","Дистанція спреєм"
 ];
 var FREE = "Стартовий свисток";
 var LINES = (function(){
