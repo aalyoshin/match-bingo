@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бінго на матч</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rubik:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#0b1020;
+  background-image:radial-gradient(60vw 40vh at 110% 110%, rgba(232,73,46,.16), transparent 60%),
+                   radial-gradient(50vw 30vh at -10% -10%, rgba(39,67,214,.22), transparent 60%);
+  color:#eef1f9;font-family:'Rubik',system-ui,sans-serif;padding:0 0 40px}
+.wrap{max-width:480px;margin:0 auto;padding:18px 14px}
+.h{font-family:'Oswald','Rubik',sans-serif;text-transform:uppercase;letter-spacing:.04em}
+.kicker{font-size:13px;color:#8b93ad}
+.title{font-size:40px;line-height:1;margin:2px 0 14px}
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.code{font-family:'Oswald';font-size:15px;letter-spacing:.18em;background:#141b33;border:1px solid #232b47;
+  border-radius:10px;padding:8px 12px;color:#aab2cc}
+.code b{color:#eef1f9}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-family:'Rubik';font-size:14px;font-weight:500;
+  cursor:pointer;color:#0b1020;background:#37e07c}
+.btn.ghost{background:transparent;color:#cdd4ea;border:1px solid #3a4569}
+.btn:active{transform:scale(.98)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid #26304f;border-radius:9px;background:#121829;color:#cdd4ea;
+  font-family:'Rubik';font-size:10.5px;line-height:1.22;padding:5px 4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:background .12s,border-color .12s;-webkit-tap-highlight-color:transparent}
+.cell:focus-visible{outline:2px solid #7df0ac;outline-offset:2px}
+.cell.on{background:#123b24;border-color:#37e07c;color:#d9ffe9}
+.cell.free{background:#1a2340;border-style:dashed;border-color:#4f5b85;color:#aab2cc}
+.cell.free.on{background:#123b24;border-color:#37e07c;color:#d9ffe9}
+.cell.win{background:#1c5c36;border-color:#7df0ac;color:#fff}
+.status{margin-top:14px;font-size:14px;color:#8b93ad;min-height:22px}
+.status b{color:#7df0ac}
+.shout{margin-top:14px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.06em;font-size:26px;
+  color:#0b1020;background:#37e07c;border-radius:12px;padding:12px 14px;text-align:center;display:none}
+.shout.show{display:block}
+.note{margin-top:18px;font-size:13px;color:#8b93ad;line-height:1.5;border-top:1px solid #232b47;padding-top:14px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}.btn:active{transform:none}}
+@media (max-width:360px){.cell{font-size:9.5px}.title{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker h">Картка вболівальника</div>
+  <h1 class="title h">Бінго на матч</h1>
+
+  <div class="bar">
+    <div class="code">Картка <b id="code">····</b></div>
+    <button class="btn" id="fresh">Нова картка</button>
+    <button class="btn ghost" id="clear">Очистити</button>
+  </div>
+
+  <div class="grid" id="grid" role="group" aria-label="Картка бінго"></div>
+
+  <div class="status" id="status"></div>
+  <div class="shout h" id="shout">Бінго!</div>
+
+  <p class="note">Тисни на клітинку, коли подія стається в матчі. Мета — зібрати рядок, стовпець
+  або діагональ. Центр зарахований одразу. Код картки і твої позначки зберігаються в адресі
+  сторінки, тож перезавантаження нічого не зітре. Щоб грати вдвох чи втрьох, кожен відкриває
+  сторінку окремо і тисне «Нова картка» — випадуть різні події.</p>
+</div>
+
+<script>
+var EVENTS = [
+  "Пенальті","Червона картка","Гол головою","Влучили в штангу","Автогол",
+  "Гол зі штрафного","VAR скасував гол","Суддя пішов до монітора","Офсайд на міліметри",
+  "Нічия 0:0 у перерві","Заміна до 30-ї хвилини","Травма з носилками","Суперечка з арбітром",
+  "Жовта за симуляцію","Гол у компенсований час","Камера показала тренера","Тренер розлютився",
+  "Повтор із трьох ракурсів","Вболівальник із прапором","Камера знайшла дитину на трибуні",
+  "Пас назад воротарю","Воротар вибив за бокову","Кутовий без удару","Стінка підстрибнула",
+  "М'яч у сітку збоку","Суддя показав «граємо далі»","Четвертий арбітр підняв табло",
+  "Воротар пішов на кутовий","Фол останньої надії","Гравець зняв футболку",
+  "Святкування на колінах","Два голи за пʼять хвилин","Удар у дальню дев'ятку","Гол після рикошету",
+  "Пенальті не забили","Воротар відбив пенальті","Гравець просить заміну","Дощ або сніг на полі",
+  "Порожні сектори в кадрі","Піротехніка на трибунах","Коментатор згадав 2006-й",
+  "Коментатор переплутав гравців","Мʼяч влетів на трибуни","Суддя відрахував дистанцію спреєм"
+];
+var FREE = "Стартовий свисток";
+var LINES = (function(){
+  var L=[],i,j;
+  for(i=0;i<5;i++){ var r=[],c=[]; for(j=0;j<5;j++){ r.push(i*5+j); c.push(j*5+i); } L.push(r); L.push(c); }
+  L.push([0,6,12,18,24]); L.push([4,8,12,16,20]);
+  return L;
+})();
+
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0;
+  var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t;
+  return ((t^t>>>14)>>>0)/4294967296; }; }
+function seedOf(code){ var s=0; for(var i=0;i<code.length;i++) s=(s*31+code.charCodeAt(i))|0; return s||1; }
+function newCode(){ var a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s=""; 
+  for(var i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+
+var code="", cells=[], marks=0;
+
+function buildCells(c){
+  var r=rng(seedOf(c)), pool=EVENTS.slice(), pick=[];
+  while(pick.length<24 && pool.length) pick.push(pool.splice(Math.floor(r()*pool.length),1)[0]);
+  pick.splice(12,0,FREE);
+  return pick;
+}
+function isOn(i){ return (marks>>i & 1)===1; }
+function winners(){
+  var w={},any=false;
+  LINES.forEach(function(L){ if(L.every(isOn)){ any=true; L.forEach(function(i){ w[i]=1; }); } });
+  return any?w:null;
+}
+function writeHash(){ location.replace("#"+code+"-"+marks.toString(36)); }
+function readHash(){
+  var m=/^#([A-Z0-9]{4})-([0-9a-z]+)$/.exec(location.hash||"");
+  if(!m) return false;
+  code=m[1]; marks=parseInt(m[2],36)|0; return true;
+}
+
+function render(){
+  var g=document.getElementById("grid"), w=winners();
+  g.innerHTML="";
+  cells.forEach(function(txt,i){
+    var b=document.createElement("button");
+    b.className="cell"+(i===12?" free":"")+(isOn(i)?" on":"")+(w&&w[i]?" win":"");
+    b.textContent=txt;
+    b.setAttribute("aria-pressed",isOn(i)?"true":"false");
+    b.onclick=function(){ marks^=(1<<i); writeHash(); render(); };
+    g.appendChild(b);
+  });
+  document.getElementById("code").textContent=code;
+  var n=0; for(var i=0;i<25;i++) if(isOn(i)) n++;
+  document.getElementById("status").innerHTML = w
+    ? "Лінія зібрана. Клітинок відмічено: <b>"+n+"</b> з 25."
+    : "Відмічено <b>"+n+"</b> з 25. До лінії ще далеко? Дивись матч.";
+  document.getElementById("shout").className="shout h"+(w?" show":"");
+}
+
+function start(fresh){
+  if(fresh || !readHash()){ code=newCode(); marks=1<<12; }
+  cells=buildCells(code);
+  writeHash(); render();
+}
+
+document.getElementById("fresh").onclick=function(){ start(true); };
+document.getElementById("clear").onclick=function(){ marks=1<<12; writeHash(); render(); };
+window.addEventListener("hashchange",function(){ if(readHash()){ cells=buildCells(code); render(); } });
+start(false);
+</script>
+</body>
+</html>
