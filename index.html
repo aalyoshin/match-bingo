@@ -15,14 +15,27 @@ body{min-height:100vh;background:#0b1020;
 .wrap{max-width:480px;margin:0 auto;padding:18px 14px}
 .h{font-family:'Oswald','Rubik',sans-serif;text-transform:uppercase;letter-spacing:.04em}
 .kicker{font-size:13px;color:#8b93ad}
-.title{font-size:40px;line-height:1;margin:2px 0 14px}
+.title{font-size:40px;line-height:1;margin:2px 0 14px;overflow-wrap:anywhere}
+.pick{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:#8b93ad}
+.pick select{flex:1;min-width:0;font-family:'Rubik';font-size:16px;color:#eef1f9;background:#141b33;
+  border:1px solid #232b47;border-radius:10px;padding:9px 10px}
+.gist{background:#121829;border:1px solid #26304f;border-radius:12px;padding:12px;margin-bottom:12px;
+  font-size:13px;line-height:1.5;color:#aab2cc}
+.gist[hidden]{display:none}
+.gist ol{padding-left:18px;margin:4px 0 10px}
+.gist a{color:#7df0ac}
+.gist code{font-family:ui-monospace,monospace;color:#eef1f9;background:#1a2340;border-radius:4px;padding:0 4px}
+.row{display:flex;gap:8px}
+.row input{flex:1;min-width:0;font-family:'Rubik';font-size:16px;color:#eef1f9;background:#0b1020;
+  border:1px solid #3a4569;border-radius:10px;padding:9px 10px}
 .bar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .code{font-family:'Oswald';font-size:15px;letter-spacing:.18em;background:#141b33;border:1px solid #232b47;
-  border-radius:10px;padding:8px 12px;color:#aab2cc}
+  border-radius:10px;padding:8px 12px;color:#aab2cc;white-space:nowrap}
 .code b{color:#eef1f9}
 .btn{border:none;border-radius:10px;padding:10px 14px;font-family:'Rubik';font-size:14px;font-weight:500;
-  cursor:pointer;color:#0b1020;background:#37e07c}
+  cursor:pointer;color:#0b1020;background:#37e07c;white-space:nowrap}
 .btn.ghost{background:transparent;color:#cdd4ea;border:1px solid #3a4569}
+.btn:disabled{opacity:.4;cursor:default}
 .btn:active{transform:scale(.98)}
 .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%}
 .cell{aspect-ratio:1;border:1px solid #26304f;border-radius:9px;background:#121829;color:#cdd4ea;
@@ -35,20 +48,41 @@ body{min-height:100vh;background:#0b1020;
 .cell.free{background:#1a2340;border-style:dashed;border-color:#4f5b85;color:#aab2cc}
 .cell.free.on{background:#123b24;border-color:#37e07c;color:#d9ffe9}
 .cell.win{background:#1c5c36;border-color:#7df0ac;color:#fff}
-.status{margin-top:14px;font-size:14px;color:#8b93ad;min-height:22px}
+.status{margin-top:14px;font-size:14px;color:#8b93ad;min-height:22px;line-height:1.45}
 .status b{color:#7df0ac}
+.status.err{color:#ff8a75}
 .shout{margin-top:14px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.06em;font-size:26px;
   color:#0b1020;background:#37e07c;border-radius:12px;padding:12px 14px;text-align:center;display:none}
 .shout.show{display:block}
+.share{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.share input{font-family:ui-monospace,monospace;font-size:16px;color:#cdd4ea;background:#141b33;
+  border:1px solid #232b47;border-radius:10px;padding:9px 10px;width:100%}
+.share input[hidden]{display:none}
 .note{margin-top:18px;font-size:13px;color:#8b93ad;line-height:1.5;border-top:1px solid #232b47;padding-top:14px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}.btn:active{transform:none}}
-@media (max-width:360px){.title{font-size:32px}}
+@media (max-width:360px){.title{font-size:32px}.bar{gap:6px}.btn{padding:10px 9px;font-size:13px}
+  .code{padding:8px 8px;letter-spacing:.08em;font-size:14px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="kicker h">Картка вболівальника</div>
-  <h1 class="title h">Бінго на матч</h1>
+  <div class="kicker h" id="kicker">Картка вболівальника</div>
+  <h1 class="title h" id="title">Бінго на матч</h1>
+
+  <label class="pick">Набір <select id="pack"></select></label>
+
+  <div class="gist" id="gist" hidden>
+    <b>Свій список подій</b>
+    <ol>
+      <li>Відкрий <a href="https://gist.github.com/" target="_blank" rel="noopener">gist.github.com</a> (потрібен акаунт GitHub).</li>
+      <li>Впиши події, по одній у рядку, щонайменше 24. Рядок <code># Назва</code> стане заголовком, а рядок <code>Центр: …</code> центральною клітинкою. Обидва необовʼязкові.</li>
+      <li>Натисни «Create secret gist» і встав сюди посилання на сторінку.</li>
+    </ol>
+    <div class="row">
+      <input id="gistIn" type="url" inputmode="url" autocomplete="off" placeholder="https://gist.github.com/…">
+      <button class="btn" id="gistGo">Готово</button>
+    </div>
+  </div>
 
   <div class="bar">
     <div class="code">Картка <b id="code">····</b></div>
@@ -61,28 +95,78 @@ body{min-height:100vh;background:#0b1020;
   <div class="status" id="status"></div>
   <div class="shout h" id="shout">Бінго!</div>
 
-  <p class="note">Тисни на клітинку, коли подія стається в матчі. Мета — зібрати рядок, стовпець
-  або діагональ. Центр зарахований одразу. Код картки і твої позначки зберігаються в адресі
-  сторінки, тож перезавантаження нічого не зітре. Щоб грати вдвох чи втрьох, кожен відкриває
-  сторінку окремо і тисне «Нова картка» — випадуть різні події.</p>
+  <div class="share">
+    <button class="btn ghost" id="share">Скопіювати посилання для компанії</button>
+    <input id="shareOut" readonly hidden aria-label="Посилання для компанії">
+  </div>
+
+  <p class="note">Тисни на клітинку, коли подія стається. Мета: зібрати рядок, стовпець
+  або діагональ. Центр зарахований одразу. Код картки й позначки зберігаються в адресі
+  сторінки, тож перезавантаження нічого не зітре. Щоб грати компанією, надішли друзям
+  посилання на набір: кожен, хто його відкриє, отримає власну картку з тих самих подій.</p>
 </div>
 
 <script>
-var EVENTS = [
-  "Пенальті","Червона картка","Гол головою","Влучили в штангу","Автогол",
-  "Гол зі штрафного","VAR скасував гол","Суддя пішов до монітора","Офсайд на міліметри",
-  "Нічия 0:0 у перерві","Заміна до 30-ї хвилини","Травма з носилками","Суперечка з арбітром",
-  "Жовта за симуляцію","Гол у компенсований","Камера показала тренера","Тренер розлютився",
-  "Повтор із трьох ракурсів","Фанат із прапором","Дитина на трибуні",
-  "Пас назад воротарю","Воротар вибив за бокову","Кутовий без удару","Стінка підстрибнула",
-  "М'яч у сітку збоку","Суддя: граємо далі","Табло на заміну",
-  "Воротар пішов на кутовий","Фол останньої надії","Гравець зняв футболку",
-  "Святкування на колінах","Два голи за пʼять хвилин","Удар у дальню дев'ятку","Гол після рикошету",
-  "Пенальті не забили","Воротар відбив пенальті","Гравець просить заміну","Дощ або сніг на полі",
-  "Порожні сектори","Піротехніка на трибунах","Коментатор згадав 2006-й",
-  "Коментатор переплутав гравців","Мʼяч влетів на трибуни","Дистанція спреєм"
-];
-var FREE = "Стартовий свисток";
+var PACKS = {
+  fb: { name:"Футбол", kicker:"Картка вболівальника", title:"Бінго на матч", free:"Стартовий свисток", events:[
+    "Пенальті","Червона картка","Гол головою","Влучили в штангу","Автогол",
+    "Гол зі штрафного","VAR скасував гол","Суддя пішов до монітора","Офсайд на міліметри",
+    "Нічия 0:0 у перерві","Заміна до 30-ї хвилини","Травма з носилками","Суперечка з арбітром",
+    "Жовта за симуляцію","Гол у компенсований","Камера показала тренера","Тренер розлютився",
+    "Повтор із трьох ракурсів","Фанат із прапором","Дитина на трибуні",
+    "Пас назад воротарю","Воротар вибив за бокову","Кутовий без удару","Стінка підстрибнула",
+    "М'яч у сітку збоку","Суддя: граємо далі","Табло на заміну",
+    "Воротар пішов на кутовий","Фол останньої надії","Гравець зняв футболку",
+    "Святкування на колінах","Два голи за пʼять хвилин","Удар у дальню дев'ятку","Гол після рикошету",
+    "Пенальті не забили","Воротар відбив пенальті","Гравець просить заміну","Дощ або сніг на полі",
+    "Порожні сектори","Піротехніка на трибунах","Коментатор згадав 2006-й",
+    "Коментатор переплутав гравців","Мʼяч влетів на трибуни","Дистанція спреєм"
+  ]},
+  euro: { name:"Євробачення", kicker:"Картка глядача", title:"Бінго: Євробачення", free:"Перша пісня", events:[
+    "Вітродуйка на сцені","Піротехніка","Зміна костюма на сцені","Балада біля рояля","Співак босоніж",
+    "Костюм із блискітками","Пісня не англійською","Гурт у масках","Багато танцюристів","Сльози в грін-румі",
+    "Прапор у залі крупно","Ведучі заспівали","Жарт ведучих не зайшов","Хтось сфальшивив","Технічна накладка",
+    "Вокаліст на колінах","Гігантський реквізит","Дощ або сніг на сцені","Ведучий сплутав країну","Народний інструмент",
+    "Зірка минулих років","Згадали Руслану","12 балів сусідам","Нуль від глядачів","Україна в топ-10",
+    "Високий фальцет","Сердечко руками в камеру","Інтервал-акт затягнувся","Оплески стоячи","Переможець плаче"
+  ]},
+  nv: { name:"Нацвідбір", kicker:"Картка глядача", title:"Бінго: Нацвідбір", free:"Перший номер", events:[
+    "Суддя встав аплодувати","Суддя розкритикував вокал","Народний інструмент","Етнічний костюм","Пісня англійською",
+    "Пісня українською","Дві мови в пісні","Технічна пауза","Ведучі тягнуть результат","Нагадали про голосування в Дії",
+    "Згадали Kalush","Згадали Джамалу","Подяка ЗСУ","Звук відстав від картинки","Вокаліст на колінах",
+    "Піротехніка","Вітродуйка","Журі й глядачі не згодні","Фаворит не переміг","Промова переможця",
+    "Багато танцюристів","Хор на сцені","Реп-вставка","Зміна костюма на сцені","Сльози за кулісами",
+    "Згадали маму","Зал скандує","Учасник забув слова","Високий фальцет","Оплески стоячи"
+  ]},
+  f1: { name:"Формула-1", kicker:"Картка вболівальника", title:"Бінго: Формула-1", free:"Згасли вогні", events:[
+    "Сейфті-кар","Віртуальний сейфті-кар","Червоний прапор","Жовтий прапор","Обгін на першому колі",
+    "Контакт на старті","Штраф 5 секунд","Повільний піт-стоп","Піт-стоп за 2 секунди","Дощ на трасі",
+    "Проміжні шини","Сход через техніку","Вилетів у гравій","Удар об стіну","Скарга по радіо",
+    "Командний наказ","Найшвидше коло в кінці","DRS-поїзд","Обгін на останньому колі","Розбір у стюардів",
+    "Час знято за трек-ліміти","Зірка в боксах","Шеф команди в кадрі","Перемога з поула","Дубль однієї команди",
+    "Перевищення в піт-лейні","Уламки на трасі","Блокування коліс","Феррарі схибила","Механіки святкують"
+  ]},
+  oscar: { name:"Оскар", kicker:"Картка глядача", title:"Бінго: Оскар", free:"Перший жарт ведучого", events:[
+    "Жарт про тривалість","Промову обірвала музика","Переможець плаче","Подякував мамі","Подякував агенту",
+    "Політична промова","Оплески стоячи","Камера на того, хто програв","Селфі в залі","Музичний номер",
+    "Хтось спіткнувся","Промова з папірця","Промова не англійською","Жарт про стримінги","Сюрприз-переможець",
+    "Фаворит програв","Ведучий пішов у зал","Ведучий змінив костюм","Фільм узяв 3+ статуетки","Жарт про ШІ",
+    "Мікрофон не на тій висоті","Діти на сцені","Згадали Україну","Подяка Богу","Промова понад хвилину",
+    "Слово запікали","Ведучий танцює","Сукня зі шлейфом","Нагороду вручає пара","Переміг фільм про війну"
+  ]},
+  ny: { name:"Новорічна ніч", kicker:"Картка гостя", title:"Бінго: Новий рік", free:"Опівніч", events:[
+    "Звернення президента","Не встиг загадати бажання","Олівʼє на столі","Оселедець під шубою","Мандарини",
+    "Шампанське облило когось","Феєрверк за вікном","Хтось заснув до першої","Дзвінок від родичів","Відеодзвінок з-за кордону",
+    "Тост на пʼять хвилин","Новорічний светр","Звучить «Щедрик»","Подарунок не того розміру","Шкарпетки в подарунок",
+    "Зачепили ялинку","Бенгальські вогні","Танці на кухні","Розбили келих","Кіт атакує ялинку",
+    "Фото всім столом","Хтось заговорив про роботу","Обійми рівно опівночі","Холодець","Суперечка про політику",
+    "«Сам удома» по телевізору","Конфеті на підлозі","Хтось запізнився","Хтось загубив телефон","Салют о першій ночі"
+  ]}
+};
+var ORDER = ["fb","euro","nv","f1","oscar","ny"];
+var MIN_EVENTS = 24;
+var CACHE_MS = 30*60*1000;
+
 var LINES = (function(){
   var L=[],i,j;
   for(i=0;i<5;i++){ var r=[],c=[]; for(j=0;j<5;j++){ r.push(i*5+j); c.push(j*5+i); } L.push(r); L.push(c); }
@@ -94,15 +178,76 @@ function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0;
   var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t;
   return ((t^t>>>14)>>>0)/4294967296; }; }
 function seedOf(code){ var s=0; for(var i=0;i<code.length;i++) s=(s*31+code.charCodeAt(i))|0; return s||1; }
-function newCode(){ var a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s=""; 
+function newCode(){ var a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s="";
   for(var i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+function $(id){ return document.getElementById(id); }
 
-var code="", cells=[], marks=0;
+var src="fb", pool=null, code="", cells=[], marks=0, loadToken=0, lastHash=null;
+
+/* Формат адреси:
+   #K7QM-1a2b                    футбол (старі посилання)
+   #euro / #euro-K7QM-1a2b       готовий набір; без коду картки = нова картка
+   #g.<id> / #g.<id>-K7QM-1a2b   свій список із GitHub Gist */
+function parseHash(h){
+  var m=/^#([A-Z0-9]{4})-([0-9a-z]+)$/.exec(h||"");
+  if(m) return {src:"fb", code:m[1], marks:parseInt(m[2],36)|0};
+  m=/^#(g\.[0-9a-f]{20,40}|[a-z][a-z0-9]{0,9})(?:-([A-Z0-9]{4})-([0-9a-z]+))?$/.exec(h||"");
+  if(!m) return null;
+  if(m[1].indexOf("g.")!==0 && !PACKS[m[1]]) return null;
+  return {src:m[1], code:m[2]||null, marks:m[3]?parseInt(m[3],36)|0:0};
+}
+function writeHash(){
+  lastHash="#"+(src==="fb"?"":src+"-")+code+"-"+marks.toString(36);
+  location.replace(lastHash);
+}
+
+function gistIdFrom(s){
+  var parts=String(s||"").trim().split(/[\/#?]/);
+  for(var i=0;i<parts.length;i++) if(/^[0-9a-f]{20,40}$/i.test(parts[i])) return parts[i].toLowerCase();
+  return null;
+}
+function parseList(text){
+  var title="", free="Старт", ev=[], seen={};
+  String(text).split(/\r?\n/).forEach(function(line){
+    var l=line.trim(); if(!l) return;
+    if(l.charAt(0)==="#"){ if(!title) title=l.replace(/^#+\s*/,""); return; }
+    var c=/^центр\s*:\s*(.+)$/i.exec(l); if(c){ free=c[1]; return; }
+    l=l.replace(/^(?:[-*•–]|\d+[.)])\s+/,"").trim(); if(!l) return;
+    var k=l.toLowerCase(); if(seen[k]) return; seen[k]=1; ev.push(l.slice(0,60));
+  });
+  return { kicker:"Своя картка", title:(title||"Своє бінго").slice(0,40), free:free.slice(0,40), events:ev };
+}
+function fetchGist(id, cb){
+  var key="bingo-gist:"+id, cached=null;
+  try{ cached=JSON.parse(localStorage.getItem(key)||"null"); }catch(e){}
+  if(cached && Date.now()-cached.t<CACHE_MS){ cb(null,cached.text); return; }
+  fetch("https://api.github.com/gists/"+id,{headers:{Accept:"application/vnd.github+json"}})
+    .then(function(r){
+      if(r.status===404) throw new Error("404");
+      if(r.status===403||r.status===429) throw new Error("limit");
+      if(!r.ok) throw new Error("net");
+      return r.json();
+    })
+    .then(function(j){
+      var files=Object.keys(j.files||{}).map(function(k){ return j.files[k]; });
+      if(!files.length) throw new Error("empty");
+      if(files[0].truncated) return fetch(files[0].raw_url).then(function(r){ return r.text(); });
+      return files[0].content||"";
+    })
+    .then(function(t){ try{ localStorage.setItem(key,JSON.stringify({t:Date.now(),text:t})); }catch(e){} cb(null,t); })
+    .catch(function(e){ if(cached) cb(null,cached.text); else cb(e.message||"net"); });
+}
+var ERR = {
+  "404":"Gist не знайдено. Перевір посилання.",
+  "limit":"GitHub тимчасово обмежив запити з цієї мережі (60 на годину). Спробуй за кілька хвилин.",
+  "empty":"У цьому gist немає файлів.",
+  "net":"Не вдалося завантажити список. Перевір інтернет."
+};
 
 function buildCells(c){
-  var r=rng(seedOf(c)), pool=EVENTS.slice(), pick=[];
-  while(pick.length<24 && pool.length) pick.push(pool.splice(Math.floor(r()*pool.length),1)[0]);
-  pick.splice(12,0,FREE);
+  var r=rng(seedOf(c)), p=pool.events.slice(), pick=[];
+  while(pick.length<24 && p.length) pick.push(p.splice(Math.floor(r()*p.length),1)[0]);
+  pick.splice(12,0,pool.free);
   return pick;
 }
 function isOn(i){ return (marks>>i & 1)===1; }
@@ -111,15 +256,21 @@ function winners(){
   LINES.forEach(function(L){ if(L.every(isOn)){ any=true; L.forEach(function(i){ w[i]=1; }); } });
   return any?w:null;
 }
-function writeHash(){ location.replace("#"+code+"-"+marks.toString(36)); }
-function readHash(){
-  var m=/^#([A-Z0-9]{4})-([0-9a-z]+)$/.exec(location.hash||"");
-  if(!m) return false;
-  code=m[1]; marks=parseInt(m[2],36)|0; return true;
+
+function setPool(P){
+  pool=P;
+  $("kicker").textContent=P.kicker; $("title").textContent=P.title; document.title=P.title;
 }
+function setBusy(msg, isErr){
+  pool=null; cells=[]; $("grid").innerHTML=""; $("code").textContent="····";
+  $("shout").className="shout h";
+  var s=$("status"); s.textContent=msg; s.className="status"+(isErr?" err":"");
+  $("fresh").disabled=$("clear").disabled=true;
+}
+function syncSelect(){ $("pack").value = PACKS[src] ? src : "custom"; }
 
 function render(){
-  var g=document.getElementById("grid"), w=winners();
+  var g=$("grid"), w=winners();
   g.innerHTML="";
   cells.forEach(function(txt,i){
     var b=document.createElement("button");
@@ -129,24 +280,69 @@ function render(){
     b.onclick=function(){ marks^=(1<<i); writeHash(); render(); };
     g.appendChild(b);
   });
-  document.getElementById("code").textContent=code;
+  $("code").textContent=code;
+  $("fresh").disabled=$("clear").disabled=false;
   var n=0; for(var i=0;i<25;i++) if(isOn(i)) n++;
-  document.getElementById("status").innerHTML = w
+  var s=$("status"); s.className="status";
+  s.innerHTML = w
     ? "Лінія зібрана. Клітинок відмічено: <b>"+n+"</b> з 25."
-    : "Відмічено <b>"+n+"</b> з 25. До лінії ще далеко? Дивись матч.";
-  document.getElementById("shout").className="shout h"+(w?" show":"");
+    : "Відмічено <b>"+n+"</b> з 25. До лінії ще далеко? Дивись далі.";
+  $("shout").className="shout h"+(w?" show":"");
 }
 
-function start(fresh){
-  if(fresh || !readHash()){ code=newCode(); marks=1<<12; }
-  cells=buildCells(code);
-  writeHash(); render();
+function finish(p){
+  if(p.code){ code=p.code; marks=p.marks|(1<<12); } else { code=newCode(); marks=1<<12; }
+  cells=buildCells(code); writeHash(); render();
+}
+function apply(p){
+  var token=++loadToken;
+  src=p.src; syncSelect(); $("shareOut").hidden=true;
+  if(PACKS[src]){ $("gist").hidden=true; setPool(PACKS[src]); finish(p); return; }
+  setBusy("Завантажую список…");
+  fetchGist(src.slice(2), function(err,text){
+    if(token!==loadToken) return;
+    if(err){ setBusy(ERR[err]||ERR.net, true); $("gist").hidden=false; return; }
+    var P=parseList(text);
+    if(P.events.length<MIN_EVENTS){
+      setBusy("У списку "+P.events.length+" подій, а потрібно щонайменше "+MIN_EVENTS+". Допиши gist і відкрий посилання ще раз.", true);
+      $("gist").hidden=false; return;
+    }
+    $("gist").hidden=true; setPool(P); finish(p);
+  });
+}
+function go(hash){
+  if(hash===lastHash) return;
+  apply(parseHash(hash) || {src:"fb", code:null});
 }
 
-document.getElementById("fresh").onclick=function(){ start(true); };
-document.getElementById("clear").onclick=function(){ marks=1<<12; writeHash(); render(); };
-window.addEventListener("hashchange",function(){ if(readHash()){ cells=buildCells(code); render(); } });
-start(false);
+ORDER.forEach(function(k){
+  var o=document.createElement("option"); o.value=k; o.textContent=PACKS[k].name; $("pack").appendChild(o);
+});
+(function(){ var o=document.createElement("option"); o.value="custom"; o.textContent="Свій список (GitHub Gist)…"; $("pack").appendChild(o); })();
+
+$("pack").onchange=function(){
+  var v=this.value;
+  if(v==="custom"){ $("gist").hidden=false; $("gistIn").focus(); return; }
+  apply({src:v, code:null});
+};
+$("gistGo").onclick=function(){
+  var id=gistIdFrom($("gistIn").value);
+  if(!id){ setBusy("Не бачу в посиланні ID gist. Скопіюй адресу сторінки gist повністю.", true); return; }
+  try{ localStorage.removeItem("bingo-gist:"+id); }catch(e){}
+  apply({src:"g."+id, code:null});
+};
+$("gistIn").onkeydown=function(e){ if(e.key==="Enter") $("gistGo").onclick(); };
+$("fresh").onclick=function(){ if(pool) finish({code:null}); };
+$("clear").onclick=function(){ if(pool){ marks=1<<12; writeHash(); render(); } };
+$("share").onclick=function(){
+  var url=location.origin+location.pathname+(src==="fb"?"":"#"+src), out=$("shareOut"), btn=this;
+  out.value=url; out.hidden=false; out.select();
+  var done=function(){ btn.textContent="Скопійовано"; setTimeout(function(){ btn.textContent="Скопіювати посилання для компанії"; },1800); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,function(){});
+  else { try{ if(document.execCommand("copy")) done(); }catch(e){} }
+};
+window.addEventListener("hashchange",function(){ go(location.hash); });
+go(location.hash);
 </script>
 </body>
 </html>
