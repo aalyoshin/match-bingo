@@ -40,7 +40,7 @@ body{min-height:100vh;background:#0b1020;
 .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%}
 .cell{aspect-ratio:1;border:1px solid #26304f;border-radius:9px;background:#121829;color:#cdd4ea;
   font-family:'Rubik';font-size:clamp(7.5px,2.25vw,11px);line-height:1.2;padding:4px 3px;cursor:pointer;
-  min-width:0;overflow:hidden;overflow-wrap:anywhere;hyphens:auto;
+  min-width:0;overflow:hidden;overflow-wrap:break-word;hyphens:manual;-webkit-hyphens:manual;
   display:flex;align-items:center;justify-content:center;text-align:center;
   transition:background .12s,border-color .12s;-webkit-tap-highlight-color:transparent}
 .cell:focus-visible{outline:2px solid #7df0ac;outline-offset:2px}
